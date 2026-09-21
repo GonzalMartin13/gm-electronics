@@ -4,7 +4,8 @@
    generación del pedido en PDF.
    ============================================================ */
 
-const ADMIN_EMAIL = "pedidos@gmelectronics.com.ar"; // ACTUALIZAR con el mail real de GM Electronics
+const ADMIN_EMAIL = "gonzalo.m.martin@gmail.com";
+const ADMIN_WHATSAPP = "11 7823-4289";
 const PAGE_SIZE = 24;
 
 const state = {
@@ -303,16 +304,22 @@ function renderCart() {
     </div>
     <div class="form-field">
       <label for="custWhatsapp">WhatsApp</label>
-      <input id="custWhatsapp" type="text" placeholder="Ej: 11 2345-6789">
+      <input id="custWhatsapp" type="text" inputmode="tel" placeholder="Ej: 11 2345-6789">
     </div>
     <div class="form-field">
       <label for="custEmail">Email de contacto</label>
       <input id="custEmail" type="email" placeholder="tu@email.com">
     </div>
-    <p class="form-note">Se genera un PDF con tu pedido. Descargalo y enviálo a ${ADMIN_EMAIL} para confirmarlo.</p>
+    <p class="form-note">Se genera un PDF con tu pedido. Descargalo y enviálo a ${ADMIN_EMAIL} (o por WhatsApp al ${ADMIN_WHATSAPP}) para confirmarlo.</p>
     <button class="btn btn-primary" id="generateOrderBtn" style="width:100%; justify-content:center">Descargar pedido en PDF</button>
   `;
   document.getElementById("generateOrderBtn").addEventListener("click", generateOrderPDF);
+
+  // Sólo deja escribir números, espacios, guiones, paréntesis y "+" en WhatsApp
+  const whatsappInput = document.getElementById("custWhatsapp");
+  whatsappInput.addEventListener("input", () => {
+    whatsappInput.value = whatsappInput.value.replace(/[^0-9\s\-()+]/g, "");
+  });
 }
 
 function openCart() {
@@ -337,6 +344,19 @@ function generateOrderPDF() {
 
   if (!name || !address || !zone || !whatsapp || !email) {
     showToast("Completá nombre, dirección, zona, WhatsApp y email antes de generar el pedido");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showToast("Ingresá un email válido, con @ y dominio (ej: nombre@mail.com)");
+    return;
+  }
+
+  const phoneDigits = whatsapp.replace(/\D/g, "");
+  const phoneRegex = /^[0-9\s\-()+]+$/;
+  if (!phoneRegex.test(whatsapp) || phoneDigits.length < 8) {
+    showToast("Ingresá un WhatsApp válido, solo números (mínimo 8 dígitos)");
     return;
   }
 
@@ -408,7 +428,9 @@ function generateOrderPDF() {
 
   doc.setFont("helvetica", "italic");
   doc.setFontSize(9);
-  doc.text(`Enviá este PDF a ${ADMIN_EMAIL} para confirmar tu pedido.`, marginX, y);
+  doc.text(`Para confirmar este pedido, envianos este PDF a ${ADMIN_EMAIL}`, marginX, y);
+  y += 5;
+  doc.text(`o por WhatsApp al ${ADMIN_WHATSAPP}.`, marginX, y);
 
   const fileName = `pedido-gm-electronics-${Date.now()}.pdf`;
   doc.save(fileName);
