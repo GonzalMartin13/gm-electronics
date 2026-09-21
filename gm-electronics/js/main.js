@@ -294,12 +294,20 @@ function renderCart() {
       <input id="custName" type="text" placeholder="Tu nombre">
     </div>
     <div class="form-field">
-      <label for="custEmail">Email</label>
-      <input id="custEmail" type="email" placeholder="tu@email.com">
+      <label for="custAddress">Dirección</label>
+      <input id="custAddress" type="text" placeholder="Calle, número, piso/depto">
     </div>
     <div class="form-field">
-      <label for="custPhone">Teléfono / WhatsApp</label>
-      <input id="custPhone" type="text" placeholder="Opcional">
+      <label for="custZone">Zona / Localidad</label>
+      <input id="custZone" type="text" placeholder="Barrio, ciudad o localidad">
+    </div>
+    <div class="form-field">
+      <label for="custWhatsapp">WhatsApp</label>
+      <input id="custWhatsapp" type="text" placeholder="Ej: 11 2345-6789">
+    </div>
+    <div class="form-field">
+      <label for="custEmail">Email de contacto</label>
+      <input id="custEmail" type="email" placeholder="tu@email.com">
     </div>
     <p class="form-note">Se genera un PDF con tu pedido. Descargalo y enviálo a ${ADMIN_EMAIL} para confirmarlo.</p>
     <button class="btn btn-primary" id="generateOrderBtn" style="width:100%; justify-content:center">Descargar pedido en PDF</button>
@@ -322,11 +330,13 @@ function generateOrderPDF() {
   if (!items.length) return;
 
   const name = document.getElementById("custName").value.trim();
+  const address = document.getElementById("custAddress").value.trim();
+  const zone = document.getElementById("custZone").value.trim();
+  const whatsapp = document.getElementById("custWhatsapp").value.trim();
   const email = document.getElementById("custEmail").value.trim();
-  const phone = document.getElementById("custPhone").value.trim();
 
-  if (!name || !email) {
-    showToast("Completá al menos tu nombre y email antes de generar el pedido");
+  if (!name || !address || !zone || !whatsapp || !email) {
+    showToast("Completá nombre, dirección, zona, WhatsApp y email antes de generar el pedido");
     return;
   }
 
@@ -349,8 +359,10 @@ function generateOrderPDF() {
   y += 6;
   doc.setFont("helvetica", "normal");
   doc.text(`Nombre: ${name}`, marginX, y); y += 6;
+  doc.text(`Dirección: ${address}`, marginX, y); y += 6;
+  doc.text(`Zona: ${zone}`, marginX, y); y += 6;
+  doc.text(`WhatsApp: ${whatsapp}`, marginX, y); y += 6;
   doc.text(`Email: ${email}`, marginX, y); y += 6;
-  if (phone) { doc.text(`Teléfono: ${phone}`, marginX, y); y += 6; }
   y += 4;
 
   doc.setFont("helvetica", "bold");
@@ -380,9 +392,18 @@ function generateOrderPDF() {
   doc.setLineWidth(0.3);
   doc.line(marginX, y, 195, y);
   y += 8;
+
+  const subtotal = cartTotal();
+  const iva = subtotal * 0.21;
+  const totalConIva = subtotal + iva;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(`Subtotal (sin IVA): ${formatARS(subtotal)}`, marginX, y); y += 7;
+  doc.text(`IVA (21%): ${formatARS(iva)}`, marginX, y); y += 7;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text(`Total: ${formatARS(cartTotal())}`, marginX, y);
+  doc.setFontSize(13);
+  doc.text(`Total (con IVA): ${formatARS(totalConIva)}`, marginX, y);
   y += 12;
 
   doc.setFont("helvetica", "italic");
@@ -394,7 +415,7 @@ function generateOrderPDF() {
 
   const subject = encodeURIComponent(`Pedido GM Electronics — ${name}`);
   const body = encodeURIComponent(
-    `Hola, les envío mi pedido (adjunto el PDF descargado: ${fileName}).\n\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone || "-"}\n\nTotal: ${formatARS(cartTotal())}`
+    `Hola, les envío mi pedido (adjunto el PDF descargado: ${fileName}).\n\nNombre: ${name}\nDirección: ${address}\nZona: ${zone}\nWhatsApp: ${whatsapp}\nEmail: ${email}\n\nSubtotal (sin IVA): ${formatARS(subtotal)}\nIVA (21%): ${formatARS(iva)}\nTotal (con IVA): ${formatARS(totalConIva)}`
   );
   window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
 
