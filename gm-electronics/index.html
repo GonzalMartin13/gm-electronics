@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GM Electronics — Catálogo Mayorista</title>
+<meta name="description" content="Catálogo online de GM Electronics. Importación directa, precios mayoristas, pedidos por catálogo.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="topbar">IMPORTACIÓN DIRECTA · PRECIOS MAYORISTAS · PEDIDOS POR CATÁLOGO ONLINE</div>
+
+<header class="site">
+  <div class="wrap header-row">
+    <div class="logo">GM <span>ELECTRONICS</span><br><small></small></div>
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Buscar por nombre, código o marca...">
+    </div>
+    <button class="cart-btn" id="openCartBtn">
+      Pedido
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+  <div class="wrap">
+    <nav class="cat-nav" id="catNav"></nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="hero-eyebrow">LISTA DE PRECIOS · ACTUALIZADA</p>
+      <h1>Tecnología importada,<br>directo al mayorista.</h1>
+      <p class="lede">Auriculares, cargadores, periféricos y accesorios. Armá tu pedido desde el catálogo y lo recibís por mail, listo para confirmar.</p>
+      <div class="hero-ctas">
+        <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
+        <a href="#contacto" class="btn btn-ghost">Cómo comprar</a>
+      </div>
+    </div>
+    <div class="manifest">
+      <div class="manifest-head"><span>RESUMEN DE STOCK</span><span id="heroDate"></span></div>
+      <div class="manifest-row"><span class="num" id="statProducts">—</span><span class="label">productos<br>en catálogo</span></div>
+      <div class="manifest-row"><span class="num" id="statCats">—</span><span class="label">categorías<br>disponibles</span></div>
+      <div class="manifest-row"><span class="num">$USD</span><span class="label">precios de referencia<br>dólar nación</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap section" id="catalogo">
+  <div class="section-head">
+    <h2 id="sectionTitle">Todo el catálogo</h2>
+    <span class="count" id="resultCount"></span>
+  </div>
+  <div class="grid" id="productGrid"></div>
+  <div id="emptyState" class="empty-state" style="display:none">No encontramos productos con esa búsqueda.</div>
+  <div class="load-more-row">
+    <button class="btn btn-ghost" id="loadMoreBtn" style="display:none">Ver más productos</button>
+  </div>
+</main>
+
+<footer id="contacto">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>GM Electronics</h4>
+        <p>Catálogo mayorista de tecnología con importación directa. Los pedidos se arman desde esta página y se envían por correo para su confirmación.</p>
+      </div>
+      <div>
+        <h4>Cómo comprar</h4>
+        <p>1. Agregá productos al pedido.<br>2. Completá tus datos.<br>3. Descargá el PDF y enviálo por mail.</p>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="mailto:pedidos@gmelectronics.com.ar">pedidos@gmelectronics.com.ar</a>
+        <a href="https://wa.me/5490000000000" target="_blank" rel="noopener">WhatsApp: +54 9 00 0000-0000</a>
+        <p style="margin-top:8px">⚠️ Actualizá estos datos de contacto antes de publicar el sitio (buscá "ACTUALIZAR" en el código).</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> GM Electronics</span>
+      <span>Catálogo generado a partir de lista de precios interna</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Product detail modal -->
+<div class="overlay" id="productOverlay">
+  <div class="modal" id="productModal"></div>
+</div>
+
+<!-- Cart drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>Tu pedido</h3>
+    <button class="modal-close" id="closeCartBtn">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
