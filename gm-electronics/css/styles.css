@@ -71,6 +71,8 @@ header.site{
   letter-spacing: .01em;
   white-space: nowrap;
   display:flex; align-items:baseline; gap:8px;
+  text-decoration: none;
+  color: var(--text);
 }
 .logo span{ color: var(--accent); }
 .logo small{
@@ -205,8 +207,49 @@ header.site{
   font-family: var(--font-head); font-weight:600;
   font-size: 26px; margin:0;
 }
+.section-head-right{ display:flex; align-items:center; gap:14px; }
 .section-head .count{
   font-family: var(--font-mono); font-size: 12px; color: var(--text-faint);
+}
+.clear-filter-btn{
+  background: var(--panel-2); border:1px solid var(--accent);
+  color: var(--text); border-radius: var(--radius);
+  font-size: 12px; font-weight:600; padding: 7px 12px;
+}
+.clear-filter-btn:hover{ background: var(--accent); }
+
+/* ---------- category carousel ---------- */
+.section-cats{ padding: 10px 0 6px; }
+.carousel-arrows{ display:flex; gap:8px; }
+.arrow-btn{
+  width:32px; height:32px; border-radius:50%;
+  border:1px solid var(--border); background: var(--panel-2);
+  color: var(--text); font-size:18px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+.arrow-btn:hover{ border-color: var(--accent); color: var(--accent); }
+.cat-carousel{
+  display:flex; gap:14px; overflow-x:auto; padding-bottom: 10px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.cat-card{
+  scroll-snap-align: start;
+  flex: 0 0 190px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align:left;
+}
+.cat-card:hover{ border-color: var(--accent); }
+.cat-card .cat-card-name{
+  font-family: var(--font-head); font-weight:600; font-size:15px;
+  margin-bottom: 6px; display:block;
+}
+.cat-card .cat-card-count{
+  font-family: var(--font-mono); font-size:11.5px; color: var(--text-faint);
 }
 
 /* ---------- product grid ---------- */

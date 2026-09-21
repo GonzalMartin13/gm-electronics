@@ -41,6 +41,7 @@ async function init() {
   document.getElementById("statCats").textContent = state.categories.length - 1;
 
   renderCategoryNav();
+  renderCategoryCarousel();
   renderGrid();
   renderCart();
 
@@ -50,10 +51,17 @@ async function init() {
   els.closeCartBtn.addEventListener("click", closeCart);
   els.drawerOverlay.addEventListener("click", closeCart);
   els.productOverlay.addEventListener("click", (e) => { if (e.target === els.productOverlay) closeProduct(); });
+  els.clearFilterBtn.addEventListener("click", clearFilters);
+  els.catPrevBtn.addEventListener("click", () => els.catCarousel.scrollBy({ left: -420, behavior: "smooth" }));
+  els.catNextBtn.addEventListener("click", () => els.catCarousel.scrollBy({ left: 420, behavior: "smooth" }));
 }
 
 function cacheEls() {
   els.catNav = document.getElementById("catNav");
+  els.catCarousel = document.getElementById("catCarousel");
+  els.catPrevBtn = document.getElementById("catPrevBtn");
+  els.catNextBtn = document.getElementById("catNextBtn");
+  els.clearFilterBtn = document.getElementById("clearFilterBtn");
   els.grid = document.getElementById("productGrid");
   els.searchInput = document.getElementById("searchInput");
   els.sectionTitle = document.getElementById("sectionTitle");
@@ -78,19 +86,51 @@ function renderCategoryNav() {
     `<button class="cat-chip ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">${cat}</button>`
   ).join("");
   els.catNav.querySelectorAll(".cat-chip").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.activeCategory = btn.dataset.cat;
-      state.visibleCount = PAGE_SIZE;
-      renderCategoryNav();
-      renderGrid();
-      window.scrollTo({ top: document.getElementById("catalogo").offsetTop - 90, behavior: "smooth" });
-    });
+    btn.addEventListener("click", () => selectCategory(btn.dataset.cat));
   });
+}
+
+function renderCategoryCarousel() {
+  const counts = {};
+  state.products.forEach(p => { counts[p.categoria] = (counts[p.categoria] || 0) + 1; });
+  const cats = state.categories.filter(c => c !== "Todas");
+
+  els.catCarousel.innerHTML = cats.map(cat => `
+    <button class="cat-card" data-cat="${escapeAttr(cat)}">
+      <span class="cat-card-name">${cat}</span>
+      <span class="cat-card-count">${counts[cat] || 0} productos</span>
+    </button>
+  `).join("");
+
+  els.catCarousel.querySelectorAll(".cat-card").forEach(btn => {
+    btn.addEventListener("click", () => selectCategory(btn.dataset.cat));
+  });
+}
+
+function selectCategory(cat) {
+  state.activeCategory = cat;
+  state.visibleCount = PAGE_SIZE;
+  renderCategoryNav();
+  renderGrid();
+  window.scrollTo({ top: document.getElementById("catalogo").offsetTop - 90, behavior: "smooth" });
 }
 
 function onSearch(e) {
   state.query = e.target.value.trim().toLowerCase();
   state.visibleCount = PAGE_SIZE;
+  if (state.query && state.activeCategory !== "Todas") {
+    state.activeCategory = "Todas";
+    renderCategoryNav();
+  }
+  renderGrid();
+}
+
+function clearFilters() {
+  state.query = "";
+  state.activeCategory = "Todas";
+  state.visibleCount = PAGE_SIZE;
+  els.searchInput.value = "";
+  renderCategoryNav();
   renderGrid();
 }
 
@@ -113,6 +153,7 @@ function renderGrid() {
   els.resultCount.textContent = `${filtered.length} producto${filtered.length === 1 ? "" : "s"}`;
   els.emptyState.style.display = filtered.length ? "none" : "block";
   els.loadMoreBtn.style.display = filtered.length > visible.length ? "inline-flex" : "none";
+  els.clearFilterBtn.style.display = (state.activeCategory !== "Todas" || state.query) ? "inline-flex" : "none";
 
   els.grid.innerHTML = visible.map(cardHTML).join("");
 

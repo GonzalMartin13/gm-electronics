@@ -14,7 +14,7 @@
 
 <header class="site">
   <div class="wrap header-row">
-    <div class="logo">GM <span>ELECTRONICS</span><br><small></small></div>
+    <a href="index.html" class="logo">GM <span>ELECTRONICS</span><br><small></small></a>
     <div class="search-box">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="searchInput" type="text" placeholder="Buscar por nombre, código o marca...">
@@ -49,10 +49,24 @@
   </div>
 </section>
 
+<section class="wrap section-cats">
+  <div class="section-head">
+    <h2>Categorías</h2>
+    <div class="carousel-arrows">
+      <button class="arrow-btn" id="catPrevBtn" aria-label="Anterior">‹</button>
+      <button class="arrow-btn" id="catNextBtn" aria-label="Siguiente">›</button>
+    </div>
+  </div>
+  <div class="cat-carousel" id="catCarousel"></div>
+</section>
+
 <main class="wrap section" id="catalogo">
   <div class="section-head">
     <h2 id="sectionTitle">Todo el catálogo</h2>
-    <span class="count" id="resultCount"></span>
+    <div class="section-head-right">
+      <button class="clear-filter-btn" id="clearFilterBtn" style="display:none">✕ Quitar filtro</button>
+      <span class="count" id="resultCount"></span>
+    </div>
   </div>
   <div class="grid" id="productGrid"></div>
   <div id="emptyState" class="empty-state" style="display:none">No encontramos productos con esa búsqueda.</div>
@@ -76,6 +90,7 @@
         <h4>Contacto</h4>
         <a href="mailto:gonzalo.m.martin@gmail.com">gonzalo.m.martin@gmail.com</a>
         <a href="https://wa.me/5491178234289" target="_blank" rel="noopener">WhatsApp: +54 9 11 7823-4289</a>
+        
       </div>
     </div>
     <div class="footer-bottom">
