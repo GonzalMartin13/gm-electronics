@@ -40,7 +40,6 @@ async function init() {
   document.getElementById("statProducts").textContent = state.products.length;
   document.getElementById("statCats").textContent = state.categories.length - 1;
 
-  renderCategoryNav();
   renderCategoryCarousel();
   renderGrid();
   renderCart();
@@ -57,7 +56,6 @@ async function init() {
 }
 
 function cacheEls() {
-  els.catNav = document.getElementById("catNav");
   els.catCarousel = document.getElementById("catCarousel");
   els.catPrevBtn = document.getElementById("catPrevBtn");
   els.catNextBtn = document.getElementById("catNextBtn");
@@ -81,22 +79,13 @@ function cacheEls() {
 }
 
 /* ---------------- categories ---------------- */
-function renderCategoryNav() {
-  els.catNav.innerHTML = state.categories.map(cat =>
-    `<button class="cat-chip ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">${cat}</button>`
-  ).join("");
-  els.catNav.querySelectorAll(".cat-chip").forEach(btn => {
-    btn.addEventListener("click", () => selectCategory(btn.dataset.cat));
-  });
-}
-
 function renderCategoryCarousel() {
   const counts = {};
   state.products.forEach(p => { counts[p.categoria] = (counts[p.categoria] || 0) + 1; });
   const cats = state.categories.filter(c => c !== "Todas");
 
   els.catCarousel.innerHTML = cats.map(cat => `
-    <button class="cat-card" data-cat="${escapeAttr(cat)}">
+    <button class="cat-card ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">
       <span class="cat-card-name">${cat}</span>
       <span class="cat-card-count">${counts[cat] || 0} productos</span>
     </button>
@@ -110,7 +99,7 @@ function renderCategoryCarousel() {
 function selectCategory(cat) {
   state.activeCategory = cat;
   state.visibleCount = PAGE_SIZE;
-  renderCategoryNav();
+  renderCategoryCarousel();
   renderGrid();
   window.scrollTo({ top: document.getElementById("catalogo").offsetTop - 90, behavior: "smooth" });
 }
@@ -120,7 +109,7 @@ function onSearch(e) {
   state.visibleCount = PAGE_SIZE;
   if (state.query && state.activeCategory !== "Todas") {
     state.activeCategory = "Todas";
-    renderCategoryNav();
+    renderCategoryCarousel();
   }
   renderGrid();
 }
@@ -130,7 +119,7 @@ function clearFilters() {
   state.activeCategory = "Todas";
   state.visibleCount = PAGE_SIZE;
   els.searchInput.value = "";
-  renderCategoryNav();
+  renderCategoryCarousel();
   renderGrid();
 }
 

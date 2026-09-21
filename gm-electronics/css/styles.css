@@ -242,14 +242,17 @@ header.site{
   border-radius: var(--radius);
   padding: 16px;
   text-align:left;
+  color: var(--text);
 }
 .cat-card:hover{ border-color: var(--accent); }
+.cat-card.active{ background: var(--panel-2); border-color: var(--accent); }
 .cat-card .cat-card-name{
   font-family: var(--font-head); font-weight:600; font-size:15px;
   margin-bottom: 6px; display:block;
+  color: #FFFFFF;
 }
 .cat-card .cat-card-count{
-  font-family: var(--font-mono); font-size:11.5px; color: var(--text-faint);
+  font-family: var(--font-mono); font-size:11.5px; color: var(--text-dim);
 }
 
 /* ---------- product grid ---------- */
