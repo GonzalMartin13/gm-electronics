@@ -8,10 +8,27 @@ const ADMIN_EMAIL = "gonzalo.m.martin@gmail.com";
 const ADMIN_WHATSAPP = "11 7823-4289";
 const PAGE_SIZE = 24;
 
+const KNOWN_BRANDS = [
+  "NOGANET", "NOGA", "MOTOROLA", "KOSMO", "KINGSTON", "PHILIPS", "DAIHATSU",
+  "VINNIC", "SANDISK", "JBL", "HAVIT", "RAYOVAC", "QCY", "BAOFENG", "SOUL",
+  "GOLDERY", "EVEREADY", "KOLKE", "JEDEL", "NOBLEX", "PHILCO", "KODAK", "HUAWEI", "SONY"
+];
+
+function detectBrand(name) {
+  const upper = name.toUpperCase();
+  for (const b of KNOWN_BRANDS) {
+    if (new RegExp(`\\b${b}\\b`).test(upper)) return b;
+  }
+  return "Otras marcas";
+}
+
 const state = {
   products: [],
   categories: [],
+  brands: [],
   activeCategory: "Todas",
+  activeBrand: "Todas",
+  sortOrder: "relevancia",
   query: "",
   visibleCount: PAGE_SIZE,
   cart: loadCart(), // { productId: { id, nombre, color, code, precio, qty } }
@@ -37,10 +54,21 @@ async function init() {
 
   state.categories = ["Todas", ...new Set(state.products.map(p => p.categoria))].sort((a, b) => a === "Todas" ? -1 : a.localeCompare(b));
 
+  state.products.forEach(p => { p.marca = detectBrand(p.nombre); });
+  const brandCounts = {};
+  state.products.forEach(p => { brandCounts[p.marca] = (brandCounts[p.marca] || 0) + 1; });
+  const brandList = Object.keys(brandCounts).sort((a, b) => {
+    if (a === "Otras marcas") return 1;
+    if (b === "Otras marcas") return -1;
+    return brandCounts[b] - brandCounts[a];
+  });
+  state.brands = ["Todas", ...brandList];
+
   document.getElementById("statProducts").textContent = state.products.length;
   document.getElementById("statCats").textContent = state.categories.length - 1;
 
   renderCategoryCarousel();
+  renderBrandSelect();
   renderGrid();
   renderCart();
 
@@ -53,6 +81,16 @@ async function init() {
   els.clearFilterBtn.addEventListener("click", clearFilters);
   els.catPrevBtn.addEventListener("click", () => els.catCarousel.scrollBy({ left: -420, behavior: "smooth" }));
   els.catNextBtn.addEventListener("click", () => els.catCarousel.scrollBy({ left: 420, behavior: "smooth" }));
+  els.brandSelect.addEventListener("change", () => {
+    state.activeBrand = els.brandSelect.value;
+    state.visibleCount = PAGE_SIZE;
+    renderGrid();
+  });
+  els.sortSelect.addEventListener("change", () => {
+    state.sortOrder = els.sortSelect.value;
+    state.visibleCount = PAGE_SIZE;
+    renderGrid();
+  });
 }
 
 function cacheEls() {
@@ -60,6 +98,8 @@ function cacheEls() {
   els.catPrevBtn = document.getElementById("catPrevBtn");
   els.catNextBtn = document.getElementById("catNextBtn");
   els.clearFilterBtn = document.getElementById("clearFilterBtn");
+  els.brandSelect = document.getElementById("brandSelect");
+  els.sortSelect = document.getElementById("sortSelect");
   els.grid = document.getElementById("productGrid");
   els.searchInput = document.getElementById("searchInput");
   els.sectionTitle = document.getElementById("sectionTitle");
@@ -78,7 +118,14 @@ function cacheEls() {
   els.toast = document.getElementById("toast");
 }
 
-/* ---------------- categories ---------------- */
+/* ---------------- categories & brands ---------------- */
+function renderBrandSelect() {
+  els.brandSelect.innerHTML = state.brands.map(b =>
+    `<option value="${escapeAttr(b)}">${b === "Todas" ? "Todas las marcas" : b}</option>`
+  ).join("");
+  els.brandSelect.value = state.activeBrand;
+}
+
 function renderCategoryCarousel() {
   const counts = {};
   state.products.forEach(p => { counts[p.categoria] = (counts[p.categoria] || 0) + 1; });
@@ -117,20 +164,32 @@ function onSearch(e) {
 function clearFilters() {
   state.query = "";
   state.activeCategory = "Todas";
+  state.activeBrand = "Todas";
   state.visibleCount = PAGE_SIZE;
   els.searchInput.value = "";
+  els.brandSelect.value = "Todas";
   renderCategoryCarousel();
   renderGrid();
 }
 
 function getFiltered() {
-  return state.products.filter(p => {
+  let list = state.products.filter(p => {
     const matchesCat = state.activeCategory === "Todas" || p.categoria === state.activeCategory;
     if (!matchesCat) return false;
+    const matchesBrand = state.activeBrand === "Todas" || p.marca === state.activeBrand;
+    if (!matchesBrand) return false;
     if (!state.query) return true;
     const haystack = (p.nombre + " " + p.variantes.map(v => v.codigo).join(" ")).toLowerCase();
     return haystack.includes(state.query);
   });
+
+  if (state.sortOrder === "price_asc") {
+    list = [...list].sort((a, b) => a.precio_pesos - b.precio_pesos);
+  } else if (state.sortOrder === "price_desc") {
+    list = [...list].sort((a, b) => b.precio_pesos - a.precio_pesos);
+  }
+
+  return list;
 }
 
 /* ---------------- grid ---------------- */
@@ -142,7 +201,7 @@ function renderGrid() {
   els.resultCount.textContent = `${filtered.length} producto${filtered.length === 1 ? "" : "s"}`;
   els.emptyState.style.display = filtered.length ? "none" : "block";
   els.loadMoreBtn.style.display = filtered.length > visible.length ? "inline-flex" : "none";
-  els.clearFilterBtn.style.display = (state.activeCategory !== "Todas" || state.query) ? "inline-flex" : "none";
+  els.clearFilterBtn.style.display = (state.activeCategory !== "Todas" || state.query || state.activeBrand !== "Todas") ? "inline-flex" : "none";
 
   els.grid.innerHTML = visible.map(cardHTML).join("");
 

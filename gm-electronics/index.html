@@ -61,6 +61,12 @@
   <div class="section-head">
     <h2 id="sectionTitle">Todo el catálogo</h2>
     <div class="section-head-right">
+      <select id="brandSelect" class="filter-select" aria-label="Filtrar por marca"></select>
+      <select id="sortSelect" class="filter-select" aria-label="Ordenar por">
+        <option value="relevancia">Ordenar: relevancia</option>
+        <option value="price_asc">Precio: menor a mayor</option>
+        <option value="price_desc">Precio: mayor a menor</option>
+      </select>
       <button class="clear-filter-btn" id="clearFilterBtn" style="display:none">✕ Quitar filtro</button>
       <span class="count" id="resultCount"></span>
     </div>
