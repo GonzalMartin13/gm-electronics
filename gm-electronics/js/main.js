@@ -161,6 +161,7 @@ function cardHTML(p) {
   const hasVariants = p.variantes.length > 1;
   return `
   <div class="card" data-id="${p.id}">
+    <div class="card-img">${p.imagen ? `<img src="${p.imagen}" alt="${escapeAttr(p.nombre)}" loading="lazy">` : `<span class="no-img">Sin foto</span>`}</div>
     <span class="cat-tag">${p.categoria}</span>
     <h3>${escapeHtml(p.nombre)}</h3>
     ${hasVariants ? `<span class="variants-note">${p.variantes.length} colores/variantes disponibles</span>` : ""}
@@ -194,8 +195,11 @@ function renderProductModal(p) {
       ${v.color || "Único"} <span class="code">#${v.codigo}</span>
     </button>`).join("");
 
+  const img = (modalSelectedVariant.imagenes && modalSelectedVariant.imagenes[0]) || p.imagen;
+
   els.productModal.innerHTML = `
     <button class="modal-close" id="modalCloseBtn">✕</button>
+    ${img ? `<div class="modal-img"><img src="${img}" alt="${escapeAttr(p.nombre)}"></div>` : ""}
     <span class="cat-tag">${p.categoria}</span>
     <h2>${escapeHtml(p.nombre)}</h2>
     <div class="meta-row">
