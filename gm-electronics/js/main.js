@@ -142,7 +142,7 @@ function renderCategoryCarousel() {
 
   els.catCarousel.innerHTML = cats.map(cat => `
     <button class="cat-card ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">
-      <div class="cat-card-img">${catImage[cat] ? `<img src="${catImage[cat]}" alt="${escapeAttr(cat)}" loading="lazy">` : ""}</div>
+      <div class="cat-card-img">${catImage[cat] ? `<img src="${catImage[cat]}" alt="${escapeAttr(cat)}" loading="lazy" onerror="this.parentElement.style.display='none'">` : ""}</div>
       <span class="cat-card-name">${cat}</span>
       <span class="cat-card-count">${counts[cat] || 0} productos</span>
     </button>
@@ -230,7 +230,7 @@ function cardHTML(p) {
   const hasVariants = p.variantes.length > 1;
   return `
   <div class="card" data-id="${p.id}">
-    <div class="card-img">${p.imagen ? `<img src="${p.imagen}" alt="${escapeAttr(p.nombre)}" loading="lazy">` : `<span class="no-img">Sin foto</span>`}</div>
+    <div class="card-img">${p.imagen ? `<img src="${p.imagen}" alt="${escapeAttr(p.nombre)}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;no-img&quot;>Sin foto</span>'">` : `<span class="no-img">Sin foto</span>`}</div>
     <span class="cat-tag">${p.categoria}</span>
     <h3>${escapeHtml(p.nombre)}</h3>
     <div class="card-meta-row">
@@ -271,7 +271,7 @@ function renderProductModal(p) {
 
   els.productModal.innerHTML = `
     <button class="modal-close" id="modalCloseBtn">✕</button>
-    ${img ? `<div class="modal-img"><img src="${img}" alt="${escapeAttr(p.nombre)}"></div>` : ""}
+    ${img ? `<div class="modal-img"><img src="${img}" alt="${escapeAttr(p.nombre)}" onerror="this.parentElement.style.display='none'"></div>` : ""}
     <span class="cat-tag">${p.categoria}</span>
     <h2>${escapeHtml(p.nombre)}</h2>
     <div class="meta-row">

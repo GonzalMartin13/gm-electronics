@@ -180,7 +180,7 @@ header.site{
   max-width: 46ch;
   margin: 0 0 26px;
 }
-.hero-ctas{ display:flex; gap: 12px; }
+.hero-ctas{ display:flex; gap: 12px; margin-bottom: 32px; }
 .btn{
   display:inline-flex; align-items:center; gap:8px;
   border-radius: var(--radius);
@@ -204,13 +204,14 @@ header.site{
   padding: 10px 16px; border-bottom: 1px dashed var(--border);
   display:flex; justify-content:space-between;
 }
-.manifest-row{
-  display:flex; justify-content:space-between; align-items:baseline;
-  padding: 14px 16px; border-bottom: 1px solid var(--border);
+.manifest-cols{ display:grid; grid-template-columns: repeat(3, 1fr); }
+.manifest-col{
+  display:flex; flex-direction:column; gap:4px;
+  padding: 16px; border-right: 1px solid var(--border);
 }
-.manifest-row:last-child{ border-bottom:0; }
-.manifest-row .num{ font-family: var(--font-head); font-size: 26px; font-weight:700; color: var(--flag); }
-.manifest-row .label{ font-size: 13px; color: var(--text-dim); text-align:right; }
+.manifest-col:last-child{ border-right:0; }
+.manifest-col .num{ font-family: var(--font-head); font-size: 26px; font-weight:700; color: var(--flag); }
+.manifest-col .label{ font-size: 12.5px; color: var(--text-dim); }
 
 /* ---------- section titles ---------- */
 .section{ padding: 46px 0; }
@@ -468,10 +469,12 @@ footer{
 
 /* ---------- responsive ---------- */
 @media (max-width: 860px){
-  .hero-grid{ grid-template-columns: 1fr; }
   .header-row{ flex-wrap:wrap; }
   .search-box{ order:3; flex-basis:100%; }
   .footer-grid{ grid-template-columns: 1fr; gap: 26px; }
+  .manifest-cols{ grid-template-columns: 1fr; }
+  .manifest-col{ border-right:0; border-bottom: 1px solid var(--border); }
+  .manifest-col:last-child{ border-bottom:0; }
 }
 @media (max-width: 520px){
   .grid{ grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
