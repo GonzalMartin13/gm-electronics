@@ -108,6 +108,13 @@ header.site{
   flex-shrink:0;
 }
 .cart-btn:hover{ border-color: var(--accent); }
+.whatsapp-pill{
+  display:flex; align-items:center; gap:7px;
+  background: #1F7A3D; color:#fff; text-decoration:none;
+  border-radius: var(--radius); padding: 9px 14px;
+  font-size: 13px; font-weight:600; flex-shrink:0;
+}
+.whatsapp-pill:hover{ background: #22913F; }
 .cart-count{
   position:absolute; top:-7px; right:-7px;
   background: var(--flag); color:#17191A;
@@ -135,6 +142,14 @@ header.site{
   background: var(--panel-2);
   border-color: var(--border);
   color: var(--text);
+}
+
+/* ---------- trust strip ---------- */
+.trust-strip{
+  display:flex; gap: 22px; flex-wrap:wrap;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px; color: var(--text-dim);
 }
 
 /* ---------- hero ---------- */
@@ -245,21 +260,28 @@ header.site{
   flex: 0 0 190px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
   border-radius: var(--radius);
-  padding: 16px;
+  overflow:hidden;
   text-align:left;
   color: var(--text);
+  padding:0;
 }
 .cat-card:hover{ border-color: var(--accent); }
-.cat-card.active{ background: var(--panel-2); border-color: var(--accent); }
+.cat-card.active{ border-color: var(--accent); }
+.cat-card-img{
+  aspect-ratio: 16/10; width:100%; background: var(--panel-2);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  border-bottom: 3px solid var(--accent);
+}
+.cat-card-img img{ width:100%; height:100%; object-fit:cover; }
 .cat-card .cat-card-name{
   font-family: var(--font-head); font-weight:600; font-size:15px;
-  margin-bottom: 6px; display:block;
+  margin: 12px 14px 4px; display:block;
   color: #FFFFFF;
 }
 .cat-card .cat-card-count{
   font-family: var(--font-mono); font-size:11.5px; color: var(--text-dim);
+  display:block; margin: 0 14px 14px;
 }
 
 /* ---------- product grid ---------- */
@@ -299,6 +321,12 @@ header.site{
 .card .price{ font-family: var(--font-head); font-size: 20px; font-weight:600; color: var(--flag); }
 .card .price-usd{ font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); }
 .card .variants-note{ font-size: 11px; color: var(--text-dim); }
+.card-meta-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-height: 18px; }
+.pack-badge{
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);
+  background: var(--panel-2); border:1px solid var(--border);
+  border-radius: var(--radius); padding: 2px 7px;
+}
 .card-actions{ display:flex; gap:8px; }
 .card-actions button{
   flex:1;

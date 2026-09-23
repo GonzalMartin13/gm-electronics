@@ -67,6 +67,10 @@ async function init() {
   document.getElementById("statProducts").textContent = state.products.length;
   document.getElementById("statCats").textContent = state.categories.length - 1;
 
+  const waDigits = ADMIN_WHATSAPP.replace(/\D/g, "");
+  els.headerWhatsapp.href = `https://wa.me/549${waDigits}`;
+  els.headerWhatsapp.textContent = `WhatsApp: ${ADMIN_WHATSAPP}`;
+
   renderCategoryCarousel();
   renderBrandSelect();
   renderGrid();
@@ -107,6 +111,7 @@ function cacheEls() {
   els.emptyState = document.getElementById("emptyState");
   els.loadMoreBtn = document.getElementById("loadMoreBtn");
   els.openCartBtn = document.getElementById("openCartBtn");
+  els.headerWhatsapp = document.getElementById("headerWhatsapp");
   els.closeCartBtn = document.getElementById("closeCartBtn");
   els.cartCount = document.getElementById("cartCount");
   els.drawerOverlay = document.getElementById("drawerOverlay");
@@ -128,11 +133,16 @@ function renderBrandSelect() {
 
 function renderCategoryCarousel() {
   const counts = {};
-  state.products.forEach(p => { counts[p.categoria] = (counts[p.categoria] || 0) + 1; });
+  const catImage = {};
+  state.products.forEach(p => {
+    counts[p.categoria] = (counts[p.categoria] || 0) + 1;
+    if (!catImage[p.categoria] && p.imagen) catImage[p.categoria] = p.imagen;
+  });
   const cats = state.categories.filter(c => c !== "Todas");
 
   els.catCarousel.innerHTML = cats.map(cat => `
     <button class="cat-card ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">
+      <div class="cat-card-img">${catImage[cat] ? `<img src="${catImage[cat]}" alt="${escapeAttr(cat)}" loading="lazy">` : ""}</div>
       <span class="cat-card-name">${cat}</span>
       <span class="cat-card-count">${counts[cat] || 0} productos</span>
     </button>
@@ -223,7 +233,10 @@ function cardHTML(p) {
     <div class="card-img">${p.imagen ? `<img src="${p.imagen}" alt="${escapeAttr(p.nombre)}" loading="lazy">` : `<span class="no-img">Sin foto</span>`}</div>
     <span class="cat-tag">${p.categoria}</span>
     <h3>${escapeHtml(p.nombre)}</h3>
-    ${hasVariants ? `<span class="variants-note">${p.variantes.length} colores/variantes disponibles</span>` : ""}
+    <div class="card-meta-row">
+      ${hasVariants ? `<span class="variants-note">${p.variantes.length} colores</span>` : ""}
+      ${p.embalaje ? `<span class="pack-badge">${escapeHtml(p.embalaje)}</span>` : ""}
+    </div>
     <div class="price-row">
       <div>
         <div class="price">${formatARS(p.precio_pesos)}</div>
