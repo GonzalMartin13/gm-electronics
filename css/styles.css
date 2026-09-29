@@ -298,9 +298,10 @@ header.site{
   padding: 16px;
   display:flex; flex-direction:column; gap:10px;
   position:relative;
-  transition: border-color .15s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.35);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-.card:hover{ border-color: var(--accent); }
+.card:hover{ border-color: var(--accent); box-shadow: 0 4px 14px rgba(0,0,0,.4); transform: translateY(-1px); }
 .card-img{
   aspect-ratio: 1 / 1; width:100%;
   background: var(--panel-2); border-radius: var(--radius);
@@ -320,6 +321,7 @@ header.site{
 }
 .card .price-row{ margin-top:auto; display:flex; align-items:baseline; justify-content:space-between; }
 .card .price{ font-family: var(--font-head); font-size: 20px; font-weight:600; color: var(--flag); }
+.iva-note{ font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); font-weight:500; }
 .card .price-usd{ font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); }
 .card .variants-note{ font-size: 11px; color: var(--text-dim); }
 .card-meta-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-height: 18px; }
@@ -444,7 +446,7 @@ footer{
   margin-top: 40px;
 }
 .footer-grid{
-  display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px;
+  display:grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 32px;
   margin-bottom: 34px;
 }
 .footer-grid h4{ font-family: var(--font-head); font-size:14px; margin: 0 0 14px; }

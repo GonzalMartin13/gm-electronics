@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", init);
 async function init() {
   cacheEls();
   document.getElementById("year").textContent = new Date().getFullYear();
-  document.getElementById("heroDate").textContent = new Date().toLocaleDateString("es-AR");
 
   try {
     const res = await fetch("data/productos.json");
@@ -239,7 +238,7 @@ function cardHTML(p) {
     </div>
     <div class="price-row">
       <div>
-        <div class="price">${formatARS(p.precio_pesos)}</div>
+        <div class="price">${formatARS(p.precio_pesos)} <span class="iva-note">+ IVA</span></div>
         <div class="price-usd">USD ${p.precio_usd.toFixed(2)} nación</div>
       </div>
     </div>
@@ -280,7 +279,7 @@ function renderProductModal(p) {
     </div>
     ${p.variantes.length > 1 ? `<div class="variant-list" id="variantList">${variantsHTML}</div>` : ""}
     <div class="price-block">
-      <span class="price" id="modalPrice">${formatARS(modalSelectedVariant.precio_pesos)}</span>
+      <span class="price" id="modalPrice">${formatARS(modalSelectedVariant.precio_pesos)}</span> <span class="iva-note">+ IVA</span>
       <span class="price-usd" id="modalPriceUsd">USD ${modalSelectedVariant.precio_usd.toFixed(2)} nación</span>
     </div>
     <p class="desc">${escapeHtml(p.descripcion)}</p>
@@ -401,14 +400,6 @@ function renderCart() {
       <input id="custName" type="text" placeholder="Tu nombre">
     </div>
     <div class="form-field">
-      <label for="custAddress">Dirección</label>
-      <input id="custAddress" type="text" placeholder="Calle, número, piso/depto">
-    </div>
-    <div class="form-field">
-      <label for="custZone">Zona / Localidad</label>
-      <input id="custZone" type="text" placeholder="Barrio, ciudad o localidad">
-    </div>
-    <div class="form-field">
       <label for="custWhatsapp">WhatsApp</label>
       <input id="custWhatsapp" type="text" inputmode="tel" placeholder="Ej: 11 2345-6789">
     </div>
@@ -416,8 +407,8 @@ function renderCart() {
       <label for="custEmail">Email de contacto</label>
       <input id="custEmail" type="email" placeholder="tu@email.com">
     </div>
-    <p class="form-note">Se genera un PDF con tu pedido. Descargalo y enviálo a ${ADMIN_EMAIL} (o por WhatsApp al ${ADMIN_WHATSAPP}) para confirmarlo.</p>
-    <button class="btn btn-primary" id="generateOrderBtn" style="width:100%; justify-content:center">Descargar pedido en PDF</button>
+    <p class="form-note">Precios sin IVA. Se genera un PDF con tu pedido para confirmar por WhatsApp o mail.</p>
+    <button class="btn btn-primary" id="generateOrderBtn" style="width:100%; justify-content:center">Enviar pedido</button>
   `;
   document.getElementById("generateOrderBtn").addEventListener("click", generateOrderPDF);
 
@@ -438,18 +429,16 @@ function closeCart() {
 }
 
 /* ---------------- PDF order generation ---------------- */
-function generateOrderPDF() {
+async function generateOrderPDF() {
   const items = Object.values(state.cart);
   if (!items.length) return;
 
   const name = document.getElementById("custName").value.trim();
-  const address = document.getElementById("custAddress").value.trim();
-  const zone = document.getElementById("custZone").value.trim();
   const whatsapp = document.getElementById("custWhatsapp").value.trim();
   const email = document.getElementById("custEmail").value.trim();
 
-  if (!name || !address || !zone || !whatsapp || !email) {
-    showToast("Completá nombre, dirección, zona, WhatsApp y email antes de generar el pedido");
+  if (!name || !whatsapp || !email) {
+    showToast("Completá nombre, WhatsApp y email antes de enviar el pedido");
     return;
   }
 
@@ -461,8 +450,8 @@ function generateOrderPDF() {
 
   const phoneDigits = whatsapp.replace(/\D/g, "");
   const phoneRegex = /^[0-9\s\-()+]+$/;
-  if (!phoneRegex.test(whatsapp) || phoneDigits.length < 8) {
-    showToast("Ingresá un WhatsApp válido, solo números (mínimo 8 dígitos)");
+  if (!phoneRegex.test(whatsapp) || phoneDigits.length < 8 || phoneDigits.length > 13) {
+    showToast("Ingresá un WhatsApp válido, solo números (entre 8 y 13 dígitos)");
     return;
   }
 
@@ -485,8 +474,6 @@ function generateOrderPDF() {
   y += 6;
   doc.setFont("helvetica", "normal");
   doc.text(`Nombre: ${name}`, marginX, y); y += 6;
-  doc.text(`Dirección: ${address}`, marginX, y); y += 6;
-  doc.text(`Zona: ${zone}`, marginX, y); y += 6;
   doc.text(`WhatsApp: ${whatsapp}`, marginX, y); y += 6;
   doc.text(`Email: ${email}`, marginX, y); y += 6;
   y += 4;
@@ -539,14 +526,32 @@ function generateOrderPDF() {
   doc.text(`o por WhatsApp al ${ADMIN_WHATSAPP}.`, marginX, y);
 
   const fileName = `pedido-gm-electronics-${Date.now()}.pdf`;
-  doc.save(fileName);
+  const pdfBlob = doc.output("blob");
+  const shareText = `Pedido GM Electronics — ${name}\nWhatsApp: ${whatsapp}\nEmail: ${email}\nTotal (con IVA): ${formatARS(totalConIva)}`;
 
+  // En celular: compartir el PDF directo por WhatsApp/Mail, sin descargar y adjuntar a mano.
+  const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: "Pedido GM Electronics",
+        text: shareText,
+      });
+      showToast("¡Listo! Elegí por dónde mandarlo (WhatsApp, mail, etc.)");
+      return;
+    } catch (err) {
+      // el usuario canceló el share o no está disponible: seguimos con el flujo de respaldo
+    }
+  }
+
+  // Respaldo (desktop o navegadores sin Web Share): descarga + mailto prellenado
+  doc.save(fileName);
   const subject = encodeURIComponent(`Pedido GM Electronics — ${name}`);
   const body = encodeURIComponent(
-    `Hola, les envío mi pedido (adjunto el PDF descargado: ${fileName}).\n\nNombre: ${name}\nDirección: ${address}\nZona: ${zone}\nWhatsApp: ${whatsapp}\nEmail: ${email}\n\nSubtotal (sin IVA): ${formatARS(subtotal)}\nIVA (21%): ${formatARS(iva)}\nTotal (con IVA): ${formatARS(totalConIva)}`
+    `Hola, les envío mi pedido (adjunto el PDF descargado: ${fileName}).\n\n${shareText}`
   );
   window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
-
   showToast("PDF descargado. Adjuntalo en el mail que se acaba de abrir.");
 }
 
