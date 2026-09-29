@@ -130,18 +130,30 @@ function renderBrandSelect() {
   els.brandSelect.value = state.activeBrand;
 }
 
+const CATEGORY_ICONS = {
+  "Almacenamiento": "images/categories/almacenamiento.svg",
+  "Audio": "images/categories/audio.svg",
+  "Audio y Radio": "images/categories/audio-y-radio.svg",
+  "Cables y Conectores": "images/categories/cables-y-conectores.svg",
+  "Cargadores y Energía": "images/categories/cargadores-y-energia.svg",
+  "Gaming y Sillas": "images/categories/gaming-y-sillas.svg",
+  "Otros": "images/categories/otros.svg",
+  "Periféricos PC": "images/categories/perifericos-pc.svg",
+  "Redes y Conectividad": "images/categories/redes-y-conectividad.svg",
+  "Smart Home y Movilidad": "images/categories/smart-home-y-movilidad.svg",
+  "Soportes y Accesorios": "images/categories/soportes-y-accesorios.svg",
+  "Video y Foto": "images/categories/video-y-foto.svg",
+  "Wearables y Smartwatches": "images/categories/wearables-y-smartwatches.svg",
+};
+
 function renderCategoryCarousel() {
   const counts = {};
-  const catImage = {};
-  state.products.forEach(p => {
-    counts[p.categoria] = (counts[p.categoria] || 0) + 1;
-    if (!catImage[p.categoria] && p.imagen) catImage[p.categoria] = p.imagen;
-  });
+  state.products.forEach(p => { counts[p.categoria] = (counts[p.categoria] || 0) + 1; });
   const cats = state.categories.filter(c => c !== "Todas");
 
   els.catCarousel.innerHTML = cats.map(cat => `
     <button class="cat-card ${cat === state.activeCategory ? "active" : ""}" data-cat="${escapeAttr(cat)}">
-      <div class="cat-card-img">${catImage[cat] ? `<img src="${catImage[cat]}" alt="${escapeAttr(cat)}" loading="lazy" onerror="this.parentElement.style.display='none'">` : ""}</div>
+      <div class="cat-card-img">${CATEGORY_ICONS[cat] ? `<img src="${CATEGORY_ICONS[cat]}" alt="${escapeAttr(cat)}" loading="lazy">` : ""}</div>
       <span class="cat-card-name">${cat}</span>
       <span class="cat-card-count">${counts[cat] || 0} productos</span>
     </button>
